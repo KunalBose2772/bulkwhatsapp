@@ -75,6 +75,8 @@ XPATHS_FILE_INPUT = [
 ]
 
 XPATHS_CAPTION_BOX = [
+    "//*[@data-testid='media-caption-input']",
+    "//div[@data-testid='media-caption-input']",
     "//div[@aria-label='Add a caption' and @contenteditable='true']",
     "//div[contains(@aria-label, 'caption') and @contenteditable='true']",
     "//div[@contenteditable='true' and @role='textbox']",
@@ -92,9 +94,15 @@ XPATHS_SEND_BTN = [
     "//span[@data-testid='send']",
     "//div[@data-testid='send']",
     "//span[@data-icon='send']",
+    "//span[@data-icon='send-light']",
+    "//*[@data-icon='send-light']",
+    "//div[@role='button' and .//span[@data-icon='send']]",
+    "//div[@role='button' and .//*[@data-icon='send']]",
+    "//button[.//span[@data-icon='send']]",
     "//button[@aria-label='Send']",
     "//div[@aria-label='Send']",
-    "//*[@data-icon='send']"
+    "//*[@data-icon='send']",
+    "//*[@role='button' and @aria-label='Send']"
 ]
 
 # --- Dynamic Path Resolution for Portability ---
@@ -442,26 +450,29 @@ def send_messages_worker():
                         file_input.send_keys(image_path)
                         time.sleep(random.uniform(1.8, 2.8)) # Human pause for image to upload/render
                         
-                        # Populate caption
-                        caption_box = find_element_with_fallbacks(driver, XPATHS_CAPTION_BOX, timeout=10)
+                        # Populate caption (if caption box is found; otherwise proceed without caption)
                         try:
-                            caption_box.click()
-                        except Exception:
-                            pass
-                        time.sleep(random.uniform(0.5, 1.0)) # Pause before typing
-                        
-                        # Safely clear the caption box using key combinations
-                        try:
-                            caption_box.send_keys(Keys.CONTROL, 'a')
-                            caption_box.send_keys(Keys.DELETE)
-                        except Exception:
-                            pass
-                        
-                        # Paste message via clipboard for speed and emoji formatting support
-                        if message_template:
-                            pyperclip.copy(message_template)
-                            ActionChains(driver).key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-                            time.sleep(random.uniform(1.0, 2.0)) # Human pause to review caption before sending
+                            caption_box = find_element_with_fallbacks(driver, XPATHS_CAPTION_BOX, timeout=5)
+                            try:
+                                caption_box.click()
+                            except Exception:
+                                pass
+                            time.sleep(random.uniform(0.5, 1.0)) # Pause before typing
+                            
+                            # Safely clear the caption box using key combinations
+                            try:
+                                caption_box.send_keys(Keys.CONTROL, 'a')
+                                caption_box.send_keys(Keys.DELETE)
+                            except Exception:
+                                pass
+                            
+                            # Paste message via clipboard for speed and emoji formatting support
+                            if message_template:
+                                pyperclip.copy(message_template)
+                                ActionChains(driver).key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+                                time.sleep(random.uniform(1.0, 2.0)) # Human pause to review caption before sending
+                        except Exception as e:
+                            log(f"⚠️ Caption input skipped or caption box not found: {e}. Attempting to send file anyway.")
                         
                         # Click the green Send button on media preview page
                         try:
