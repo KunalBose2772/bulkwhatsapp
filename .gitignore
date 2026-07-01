@@ -1,0 +1,29 @@
+# Compiled Binaries and PyInstaller files
+dist/
+build/
+*.spec
+
+# Local application/browser session files
+whatsapp_profile/
+whatsapp_session/
+chrome-data/
+chrome_data/
+User_Data/
+
+# Screenshots and log debug assets
+*.png
+*.log
+
+# Environment variables
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/

@@ -1,0 +1,6 @@
+selenium
+pyperclip
+pyautogui
+tk
+undetected-chromedriver
+pyinstaller
